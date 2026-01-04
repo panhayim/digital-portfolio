@@ -1,14 +1,43 @@
-const http = require('http');
+/* -----------------------------------------
+  Have focus outline only for keyboard users 
+ ---------------------------------------- */
 
-const hostname = '0.0.0.0';
-const port = process.env.PORT || 3000;
+const handleFirstTab = (e) => {
+  if(e.key === 'Tab') {
+    document.body.classList.add('user-is-tabbing')
 
-const server = http.createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-  res.end('Hello, world! This is index.js\n');
-});
+    window.removeEventListener('keydown', handleFirstTab)
+    window.addEventListener('mousedown', handleMouseDownOnce)
+  }
 
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
+}
+
+const handleMouseDownOnce = () => {
+  document.body.classList.remove('user-is-tabbing')
+
+  window.removeEventListener('mousedown', handleMouseDownOnce)
+  window.addEventListener('keydown', handleFirstTab)
+}
+
+window.addEventListener('keydown', handleFirstTab)
+
+const backToTopButton = document.querySelector(".back-to-top");
+let isBackToTopRendered = false;
+
+let alterStyles = (isBackToTopRendered) => {
+  backToTopButton.style.visibility = isBackToTopRendered ? "visible" : "hidden";
+  backToTopButton.style.opacity = isBackToTopRendered ? 1 : 0;
+  backToTopButton.style.transform = isBackToTopRendered
+    ? "scale(1)"
+    : "scale(0)";
+};
+
+window.addEventListener("scroll", () => {
+  if (window.scrollY > 700) {
+    isBackToTopRendered = true;
+    alterStyles(isBackToTopRendered);
+  } else {
+    isBackToTopRendered = false;
+    alterStyles(isBackToTopRendered);
+  }
 });
